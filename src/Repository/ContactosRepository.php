@@ -21,6 +21,16 @@ class ContactosRepository extends ServiceEntityRepository
         parent::__construct($registry, Contactos::class);
     }
 
+    public function findByName($text): array
+    {
+        $qb = $this->createQueryBuilder('c')
+        ->andWHere('c.nombre lIKE :text')
+        ->setParameter('text', '%' . $text . '%')
+        ->getQuery();
+        return $qb->execute();
+    }
+
+
 //    /**
 //     * @return Contactos[] Returns an array of Contactos objects
 //     */
