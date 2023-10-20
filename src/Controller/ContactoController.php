@@ -4,9 +4,15 @@ namespace App\Controller;
 
 use App\Entity\Contactos;
 use App\Entity\Provincia;
+use App\Form\ContactoFormType;
 use App\Repository\ContactosRepository;
+use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -26,6 +32,52 @@ class ContactoController extends AbstractController
         4 => ["nombre" => "Vinaros", "zip" => "11050"],
         5 => ["nombre" => "Nules", "zip" => "12001"]
     ];
+
+    #[Route('/contacto/nuevo', name: 'nuevo_contacto')]
+    public function nuevo(ManagerRegistry $doctrine, Request $request){
+    $contacto = new Contactos();
+
+    $formulario = $this->createForm(ContactoFormType::class, $contacto);
+    
+    $formulario->handleRequest($request);
+
+    if($formulario->isSubmitted() && $formulario->isValid()){
+        $contacto = $formulario->getData();
+        $entityManager = $doctrine->getManager();
+        $entityManager->persist($contacto);
+        $entityManager->flush();
+        return $this -> redirectToRoute('ficha_contacto', ["codigo" => $contacto->getId()]);
+    }
+        return $this->render('nuevo.html.twig', array(
+        'formulario' => $formulario->createView()
+    ));
+    }
+
+    #[Route('/contacto/editar/{codigo}', name:'editar_contacto', requirements:["codigo"=>"\d+"])]
+    public function editar(ManagerRegistry $doctrine, Request $request, $codigo){
+    $repositorio = $doctrine->getRepository(Contactos::class);
+    $contacto = $repositorio->find($codigo);
+    if ($contacto){
+        $formulario = $this->createForm(ContactoFormType::class, $contacto);
+
+        $formulario->handleRequest($request);
+
+        if ($formulario->isSubmitted() && $formulario->isValid()) {
+            $contacto = $formulario->getData();
+            $entityManager = $doctrine->getManager();
+            $entityManager->persist($contacto);
+            $entityManager->flush();
+            return $this->redirectToRoute('ficha_contacto', ["codigo" => $contacto->getId()]);
+        }
+        return $this->render('nuevo.html.twig', array(
+            'formulario' => $formulario->createView()
+        ));
+    }else{
+        return $this->render('ficha_contacto.html.twig', [
+            'contacto' => NULL
+        ]);
+    }
+}
 
     #[Route('/contacto/insertarProvincias', name: 'insertar_provincias')]
     public function insertarProvincia(ManagerRegistry $doctrine)
