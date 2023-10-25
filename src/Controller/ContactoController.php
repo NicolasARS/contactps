@@ -216,4 +216,15 @@ class ContactoController extends AbstractController
             return $this->render('ficha_contacto.html.twig', ['contacto' => null]);
     }
 
+    #[Route('/contactos', name: 'listar_contactos')]
+    public function listar(ManagerRegistry $doctrine): Response{
+        
+        $repositorio = $doctrine->getRepository(Contactos::class);
+        $contacto = $repositorio->findAll();
+        
+            return $this->render('lista_contactos.html.twig', ['contactos' => $contacto]);
+    }
+
 }
+
+

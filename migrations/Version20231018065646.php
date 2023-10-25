@@ -21,10 +21,10 @@ final class Version20231018065646 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         //$this->addSql('ALTER TABLE contactos ADD provincia_id INT NOT NULL, ADD zip_id INT NOT NULL');
-        $this->addSql('ALTER TABLE contactos ADD CONSTRAINT FK_3446F2C54E7121AF FOREIGN KEY (provincia_id) REFERENCES provincia (id)');
-        $this->addSql('ALTER TABLE contactos ADD CONSTRAINT FK_3446F2C57D662686 FOREIGN KEY (zip_id) REFERENCES provincia (id)');
-        $this->addSql('CREATE INDEX IDX_3446F2C54E7121AF ON contactos (provincia_id)');
-        $this->addSql('CREATE INDEX IDX_3446F2C57D662686 ON contactos (zip_id)');
+        // $this->addSql('ALTER TABLE contactos ADD CONSTRAINT FK_3446F2C54E7121AF FOREIGN KEY (provincia_id) REFERENCES provincia (id)');
+        // $this->addSql('ALTER TABLE contactos ADD CONSTRAINT FK_3446F2C57D662686 FOREIGN KEY (zip_id) REFERENCES provincia (id)');
+        // $this->addSql('CREATE INDEX IDX_3446F2C54E7121AF ON contactos (provincia_id)');
+        // $this->addSql('CREATE INDEX IDX_3446F2C57D662686 ON contactos (zip_id)');
     }
 
     public function down(Schema $schema): void
