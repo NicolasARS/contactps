@@ -1,22 +1,24 @@
-<!doctype html>
-<html>
-<meta charset="utf-8">
-<body>
+{% extends 'base.html.twig' %}
+{% block title %}Lista Contactos{% endblock %}
+{% block body %}
     <h1>Listado de contactos</h1>
-    {% if contactos %}
+    {% if contactos %}   
         {% for contacto in contactos %}
     <ul>
         <li><strong>{{ contacto.nombre}}</strong></li>
+        <li><strong>Avatar: </strong><br>
+        <img src={{ asset('/images/' ~ contacto.file) }}/></li>
         <li><strong>Teléfono: </strong>{{ contacto.telefono}}</li>
         <li><strong>Correo: </strong>{{ contacto.email}}</li>
         <li><strong>Provincia: </strong>{{ contacto.Provincia.nombre}}</li>
-        <li><strong>Provincia: </strong>{{ contacto.Provincia.zip}}</li>
+        <li><strong>Zip: </strong>{{ contacto.Provincia.zip}}</li>
+        {% if is_granted('ROLE_USER') %}
 	    <a href="contacto/editar/{{contacto.id}}" class="btn">Editar</a>
 	    <a href="contacto/delete/{{contacto.id}}" class="btn">Borrar</a>
+        {% endif %}
     </ul>
         {% endfor %}
     {% else %}
         <p>No se han encontrado contactos.</p>
     {% endif %}
-</body>
-</html>
+{% endblock %}

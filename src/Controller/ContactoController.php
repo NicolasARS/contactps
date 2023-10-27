@@ -10,14 +10,22 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DomCrawler\Image;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 class ContactoController extends AbstractController
 {
+    use TargetPathTrait;
     private $contactos = [
         1 => ["nombre" => "Juan Pérez", "telefono" => "524142432", "email" => "juanp@ieselcaminas.org"],
         2 => ["nombre" => "Ana López", "telefono" => "58958448", "email" => "anita@ieselcaminas.org"],
@@ -54,7 +62,18 @@ class ContactoController extends AbstractController
     }
 
     #[Route('/contacto/editar/{codigo}', name:'editar_contacto', requirements:["codigo"=>"\d+"])]
-    public function editar(ManagerRegistry $doctrine, Request $request, $codigo){
+    public function editar(ManagerRegistry $doctrine, Request $request, int $codigo, SluggerInterface $slugger,
+     SessionInterface $session, string $firewallName ='main'):Response
+    {
+        $link =$this->generateUrl(
+            'editar', [
+                'codigo' => $codigo
+            ]
+        );
+        $this ->saveTargetPath($session, $firewallName, $link);
+
+    
+    
     $repositorio = $doctrine->getRepository(Contactos::class);
     $contacto = $repositorio->find($codigo);
     if ($contacto){
@@ -64,6 +83,27 @@ class ContactoController extends AbstractController
 
         if ($formulario->isSubmitted() && $formulario->isValid()) {
             $contacto = $formulario->getData();
+            $file = $formulario->get('file')->getData();
+            if ($file) {
+                $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+
+                // Move the file to the directory where images are stored
+                try {
+
+                    $file->move(
+                        $this->getParameter('images_directory'), $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'file$filename' property to store the PDF file name
+                // instead of its contents
+                $contacto->setFile($newFilename);
+            }
             $entityManager = $doctrine->getManager();
             $entityManager->persist($contacto);
             $entityManager->flush();

@@ -1,11 +1,12 @@
-<!doctype html>
-<html>
-<meta charset="utf-8">
-<body>
-    <h1>Ficha del contacto</h1>
+{% extends 'base.html.twig' %}
+{% block title %}Ficha contacto{% endblock %}
+{% block body %}
+<h1>Ficha del contacto</h1>
     {% if contacto %}
     <ul>
         <li><strong>{{ contacto.nombre}}</strong></li>
+        <li><strong>Avatar: </strong><br>
+        <img src={{ asset('/images/' ~ contacto.file) }}/></li>
         <li><strong>Teléfono: </strong>{{ contacto.telefono}}</li>
         <li><strong>Correo: </strong>{{ contacto.email}}</li>
         <li><strong>Provincia: </strong>{{ contacto.Provincia.nombre}}</li>
@@ -14,5 +15,4 @@
     {% else %}
         <p>Contacto no encontrado</p>
     {% endif %}
-</body>
-</html>
+{% endblock %}

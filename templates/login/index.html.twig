@@ -3,6 +3,7 @@
 {% block title %}Area de Login{% endblock %}
 
 {% block body %}
+<h1>Area de login</h1>
     {% if error %}
         <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}

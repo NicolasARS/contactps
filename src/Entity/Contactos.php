@@ -33,6 +33,9 @@ class Contactos
     #[Assert\NotBlank(message: 'La provincia es obligatoria')]
     private ?Provincia $provincia = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $file = null;
+
 
     public function getId(): ?int
     {
@@ -83,6 +86,18 @@ class Contactos
     public function setProvincia(?Provincia $provincia): static
     {
         $this->provincia = $provincia;
+
+        return $this;
+    }
+
+    public function getFile(): ?string
+    {
+        return $this->file;
+    }
+
+    public function setFile(string $file): static
+    {
+        $this->file = $file;
 
         return $this;
     }
